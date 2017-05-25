@@ -24,8 +24,9 @@ class AdditiveGaussianNoiseAutoencoder(object):
 		network_weights = self._initialize_weights()
 		self.weights = network_weights
 		self.x = tf.placeholder(tf.float32, [None, self.n_input])
-		self.hidden = self.transfer(tf.add(tf.matmul(self.x + scale * tf.random_normal((n_input,)), self.weights['w1']), self.weights['b1']))
-		self.reconstruction = tf.add(tf.matmul(self.hidden, self.weights['w2']), self.weights['b2'])
+		self.hidden1 = self.transfer(tf.add(tf.matmul(self.x + scale * tf.random_normal((n_input,)), self.weights['w1']), self.weights['b1']))
+		self.hidden2 = self.transfer(tf.add(tf.matmul(self.hidden1 + scale * tf.random_normal((n_hidden,)), self.weights['w2']), self.weights['b2']))
+		self.reconstruction = tf.add(tf.matmul(self.hidden2, self.weights['w3']), self.weights['b3'])
 		self.cost = 0.5 * tf.reduce_sum(tf.pow(tf.subtract(self.reconstruction, self.x), 2.0))
 		self.optimizer = optimizer.minimize(self.cost)
 		init = tf.global_variables_initializer()
@@ -36,8 +37,10 @@ class AdditiveGaussianNoiseAutoencoder(object):
 		all_weights = dict()
 		all_weights['w1'] = tf.Variable(xavier_init(self.n_input, self.n_hidden))
 		all_weights['b1'] = tf.Variable(tf.zeros([self.n_hidden], dtype = tf.float32))
-		all_weights['w2'] = tf.Variable(tf.zeros([self.n_hidden, self.n_input], dtype = tf.float32))
-		all_weights['b2'] = tf.Variable(tf.zeros([self.n_input], dtype = tf.float32))
+		all_weights['w2'] = tf.Variable(xavier_init(self.n_hidden, self.n_hidden))
+		all_weights['b2'] = tf.Variable(tf.zeros([self.n_hidden], dtype = tf.float32))
+		all_weights['w3'] = tf.Variable(tf.zeros([self.n_hidden, self.n_input], dtype = tf.float32))
+		all_weights['b3'] = tf.Variable(tf.zeros([self.n_input], dtype = tf.float32))
 		return all_weights
 
 
@@ -98,3 +101,5 @@ for epoch in range(training_epochs):
 		print('Epoch:', '%04d' % (epoch + 1), 'cost=', '{:.9f}'.format(avg_cost))
 
 print('Total cost: ' + str(autoencoder.calc_total_cost(X_test)))
+print(autoencoder.getWeights())
+print(autoencoder.getBiases())
