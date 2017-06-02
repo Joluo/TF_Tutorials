@@ -243,6 +243,6 @@ with tf.Graph().as_default():
 			train_perplexity = run_epoch(session, m, eval_op = m.train_op, verbose = True)
 			print('Epoch: %d  Train Perplexity: %.3f' % (i + 1, train_perplexity))
 			valid_perplexity = run_epoch(session, mvalid)
-			print('Epoch: %  Valid Perplexity: %.3f' % (i + 1, valid_perplexity))
+			print('Epoch: %d  Valid Perplexity: %.3f' % (i + 1, valid_perplexity))
 		test_perplexity = run_epoch(session, mtest)
 		print('Test perplexity: %.3f' % test_perplexity)
